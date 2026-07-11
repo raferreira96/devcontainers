@@ -28,8 +28,5 @@
 	"installsAfter": [
 		"ghcr.io/devcontainers/features/common-utils",
 		"ghcr.io/devcontainers/features/node"
-	],
-	"containerEnv": {
-		"PATH": "${PATH}:${HOME}/.local/bin"
-	}
+	]
 }

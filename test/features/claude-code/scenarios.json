@@ -2,7 +2,7 @@
 	"npm_method": {
 		"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 		"features": {
-			"node": {},
+			"ghcr.io/devcontainers/features/node": {},
 			"claude-code": {
 				"installMethod": "npm"
 			}

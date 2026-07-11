@@ -105,17 +105,30 @@ install_via_npm() {
 	npm install -g --ignore-scripts "$pkg"
 }
 
-# Instala via instalador oficial do Pi (instala no npm global ou em ~/.local do usuário remoto).
-# Faz bootstrap do Node.js quando ausente; não requer Node.js previamente instalado.
-install_via_native() {
-	ensure_cmd curl curl ca-certificates
-
-	if [ "$PI_VERSION" != "latest" ]; then
-		echo "(!) O instalador nativo sempre instala a última versão; a opção version='${PI_VERSION}' será ignorada. Use installMethod=npm para fixar a versão."
+# Garante Node.js/npm presentes, fazendo bootstrap via NodeSource quando ausentes.
+# O Pi é uma aplicação Node e exige Node.js >= 22.19 em tempo de execução.
+ensure_node() {
+	if type npm >/dev/null 2>&1; then
+		return 0
 	fi
 
-	echo "-> Instalando o Pi via instalador oficial para o usuário '${USERNAME}'..."
-	run_as_user "export HOME='${USER_HOME}'; curl -fsSL https://pi.dev/install.sh | sh"
+	if [ "$PKG_MANAGER" != "apt" ]; then
+		echo "(!) Bootstrap automático do Node.js suportado apenas em distros baseadas em apt. Adicione a feature 'ghcr.io/devcontainers/features/node' antes desta."
+		return 1
+	fi
+
+	echo "-> Node.js/npm ausentes; instalando Node.js 22.x via NodeSource..."
+	ensure_cmd curl curl ca-certificates
+	curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+	install_packages nodejs
+}
+
+# Instala o Pi de forma autossuficiente: garante o Node.js (bootstrap se
+# necessário) e instala via npm global. O instalador oficial (pi.dev) exige um
+# terminal interativo, inviável em builds de container.
+install_via_native() {
+	ensure_node
+	install_via_npm
 }
 
 # ------------------------------------------------------------------------------
@@ -136,7 +149,7 @@ case "$INSTALL_METHOD" in
 		;;
 	auto)
 		if ! install_via_npm; then
-			echo "-> npm indisponível; recorrendo ao instalador nativo."
+			echo "-> npm indisponível; instalando Node.js e usando npm."
 			install_via_native
 		fi
 		;;

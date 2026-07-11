@@ -110,8 +110,10 @@ install_via_native() {
 	ensure_cmd curl curl ca-certificates
 	ensure_cmd unzip unzip
 
-	# Monta o comando do usuário remoto, fixando a versão via env VERSION quando aplicável.
-	local cmd="export HOME='${USER_HOME}'; "
+	# Monta o comando do usuário remoto. Faz 'unset VERSION' para não vazar a
+	# opção VERSION=latest da feature ao instalador oficial (que a interpretaria
+	# como a release inexistente 'vlatest').
+	local cmd="unset VERSION; export HOME='${USER_HOME}'; "
 	if [ "$OPENCODE_VERSION" != "latest" ]; then
 		cmd="${cmd}export VERSION='${OPENCODE_VERSION}'; "
 	fi
@@ -119,6 +121,12 @@ install_via_native() {
 
 	echo "-> Instalando o OpenCode via instalador oficial para o usuário '${USERNAME}'..."
 	run_as_user "$cmd"
+
+	# Expõe o binário em um diretório do PATH global (containerEnv HOME não é
+	# resolvido em tempo de build).
+	if [ -x "${USER_HOME}/.opencode/bin/opencode" ]; then
+		ln -sf "${USER_HOME}/.opencode/bin/opencode" /usr/local/bin/opencode
+	fi
 }
 
 # ------------------------------------------------------------------------------
