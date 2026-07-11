@@ -1,0 +1,39 @@
+{
+	"name": "PHP",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			"VARIANT": "8.4-cli-bookworm"
+		}
+	},
+	// Usuário não-root criado na imagem.
+	"remoteUser": "vscode",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"username": "vscode"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"xdebug.php-debug",
+				"bmewburn.vscode-intelephense-client",
+				"xdebug.php-pack"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"php.validate.executablePath": "/usr/local/bin/php"
+			}
+		}
+	},
+	// Confirma que PHP, Composer e as extensões-chave estão disponíveis.
+	"postCreateCommand": "php -v && composer --version && php -m | grep -E 'Xdebug|Zend OPcache'",
+	// Xdebug fica carregado, porém inativo por padrão (start_with_request=trigger),
+	// mantendo o overhead próximo de zero. Use XDEBUG_MODE=off para desligar por
+	// completo ou XDEBUG_MODE=debug,develop,coverage para habilitar mais recursos.
+	"remoteEnv": {
+		"XDEBUG_MODE": "debug,develop"
+	}
+}
