@@ -1,0 +1,35 @@
+{
+	"id": "claude-code",
+	"version": "1.0.0",
+	"name": "Claude Code",
+	"documentationURL": "https://github.com/raferreira96/devcontainers/tree/main/src/features/claude-code",
+	"description": "Instala o Claude Code, a CLI oficial da Anthropic para desenvolvimento assistido por IA no terminal.",
+	"options": {
+		"version": {
+			"type": "string",
+			"proposals": [
+				"latest",
+				"stable"
+			],
+			"default": "latest",
+			"description": "Versão do Claude Code a instalar: 'latest', 'stable' ou uma versão específica (ex.: 1.0.0)."
+		},
+		"installMethod": {
+			"type": "string",
+			"enum": [
+				"auto",
+				"npm",
+				"native"
+			],
+			"default": "auto",
+			"description": "Método de instalação. 'auto' usa npm quando disponível e recorre ao instalador nativo; 'npm' força a instalação via npm global; 'native' força o instalador oficial da Anthropic."
+		}
+	},
+	"installsAfter": [
+		"ghcr.io/devcontainers/features/common-utils",
+		"ghcr.io/devcontainers/features/node"
+	],
+	"containerEnv": {
+		"PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"
+	}
+}
