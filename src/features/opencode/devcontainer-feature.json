@@ -29,6 +29,6 @@
 		"ghcr.io/devcontainers/features/node"
 	],
 	"containerEnv": {
-		"PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.opencode/bin"
+		"PATH": "${PATH}:${HOME}/.opencode/bin"
 	}
 }
