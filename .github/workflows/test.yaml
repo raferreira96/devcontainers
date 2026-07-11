@@ -10,7 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    continue-on-error: true
     strategy:
       matrix:
         features:
@@ -27,4 +26,8 @@ jobs:
         run: npm install -g @devcontainers/cli
 
       - name: "Testar a feature '${{ matrix.features }}'"
-        run: devcontainer features test --features ${{ matrix.features }} --log-level trace .
+        run: |
+          mkdir -p collection/src collection/test
+          cp -r src/features/. collection/src/
+          cp -r test/features/. collection/test/
+          devcontainer features test --features ${{ matrix.features }} --log-level trace collection
