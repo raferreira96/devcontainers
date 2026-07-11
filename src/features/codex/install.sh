@@ -156,14 +156,10 @@ install_via_native() {
 		return 1
 	fi
 
-	local dest_dir="${USER_HOME}/.local/bin"
-	install -d -m 0755 "$dest_dir"
-	install -m 0755 "$bin" "${dest_dir}/codex"
-
-	# Garante que o usuário remoto seja dono dos arquivos criados.
-	if [ "$USERNAME" != "root" ] && [ -n "$USERNAME" ]; then
-		chown -R "$USERNAME" "${USER_HOME}/.local"
-	fi
+	# Instala em um diretório do PATH global para funcionar com qualquer usuário
+	# remoto (a variável containerEnv HOME não é resolvida em tempo de build).
+	install -d -m 0755 /usr/local/bin
+	install -m 0755 "$bin" /usr/local/bin/codex
 }
 
 # ------------------------------------------------------------------------------

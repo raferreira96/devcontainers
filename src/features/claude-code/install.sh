@@ -112,7 +112,13 @@ install_via_native() {
 	fi
 
 	echo "-> Instalando Claude Code via instalador oficial para o usuário '${USERNAME}'..."
-	run_as_user "curl -fsSL https://claude.ai/install.sh | bash -s -- ${arg}"
+	run_as_user "export HOME='${USER_HOME}'; curl -fsSL https://claude.ai/install.sh | bash -s -- ${arg}"
+
+	# Expõe o binário em um diretório do PATH global (containerEnv HOME não é
+	# resolvido em tempo de build).
+	if [ -x "${USER_HOME}/.local/bin/claude" ]; then
+		ln -sf "${USER_HOME}/.local/bin/claude" /usr/local/bin/claude
+	fi
 }
 
 # ------------------------------------------------------------------------------
