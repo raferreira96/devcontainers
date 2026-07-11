@@ -30,6 +30,6 @@
 		"ghcr.io/devcontainers/features/node"
 	],
 	"containerEnv": {
-		"PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"
+		"PATH": "${PATH}:${HOME}/.local/bin"
 	}
 }
