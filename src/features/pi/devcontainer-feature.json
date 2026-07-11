@@ -1,0 +1,34 @@
+{
+	"id": "pi",
+	"version": "1.0.0",
+	"name": "Pi Coding Agent",
+	"documentationURL": "https://github.com/raferreira96/devcontainers/tree/main/src/features/pi",
+	"description": "Instala o Pi, o agente de codificação de código aberto (BYOK) para o terminal.",
+	"options": {
+		"version": {
+			"type": "string",
+			"proposals": [
+				"latest"
+			],
+			"default": "latest",
+			"description": "Versão do Pi a instalar: 'latest' ou uma versão específica (ex.: 0.74.0). Aplicável ao método 'npm'; o instalador nativo sempre instala a última versão."
+		},
+		"installMethod": {
+			"type": "string",
+			"enum": [
+				"auto",
+				"npm",
+				"native"
+			],
+			"default": "auto",
+			"description": "Método de instalação. 'auto' usa npm quando disponível e recorre ao instalador nativo; 'npm' força a instalação via npm global; 'native' força o instalador oficial do Pi."
+		}
+	},
+	"installsAfter": [
+		"ghcr.io/devcontainers/features/common-utils",
+		"ghcr.io/devcontainers/features/node"
+	],
+	"containerEnv": {
+		"PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"
+	}
+}

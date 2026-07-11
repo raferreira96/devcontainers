@@ -1,0 +1,19 @@
+{
+	"npm_method": {
+		"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+		"features": {
+			"node": {},
+			"pi": {
+				"installMethod": "npm"
+			}
+		}
+	},
+	"native_method": {
+		"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+		"features": {
+			"pi": {
+				"installMethod": "native"
+			}
+		}
+	}
+}
