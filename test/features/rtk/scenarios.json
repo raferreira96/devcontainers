@@ -1,0 +1,18 @@
+{
+	"script_method": {
+		"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+		"features": {
+			"rtk": {
+				"installMethod": "script"
+			}
+		}
+	},
+	"binary_method": {
+		"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+		"features": {
+			"rtk": {
+				"installMethod": "binary"
+			}
+		}
+	}
+}

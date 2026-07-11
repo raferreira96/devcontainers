@@ -1,0 +1,30 @@
+{
+	"id": "rtk",
+	"version": "1.0.0",
+	"name": "RTK (Rust Token Killer)",
+	"documentationURL": "https://github.com/raferreira96/devcontainers/tree/main/src/features/rtk",
+	"description": "Instala o RTK (Rust Token Killer), um proxy de CLI que reduz o consumo de tokens em operações de desenvolvimento.",
+	"options": {
+		"version": {
+			"type": "string",
+			"proposals": [
+				"latest"
+			],
+			"default": "latest",
+			"description": "Versão do RTK a instalar: 'latest' ou uma versão específica (ex.: 0.43.0)."
+		},
+		"installMethod": {
+			"type": "string",
+			"enum": [
+				"auto",
+				"script",
+				"binary"
+			],
+			"default": "auto",
+			"description": "Método de instalação. 'auto' usa o instalador oficial e recorre ao binário pré-compilado; 'script' força o instalador oficial (com verificação de checksum); 'binary' baixa o binário direto das releases do GitHub."
+		}
+	},
+	"installsAfter": [
+		"ghcr.io/devcontainers/features/common-utils"
+	]
+}
