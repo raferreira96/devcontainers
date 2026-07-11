@@ -1,0 +1,34 @@
+{
+	"id": "opencode",
+	"version": "1.0.0",
+	"name": "OpenCode",
+	"documentationURL": "https://github.com/raferreira96/devcontainers/tree/main/src/features/opencode",
+	"description": "Instala o OpenCode, o agente de codificação de código aberto para o terminal.",
+	"options": {
+		"version": {
+			"type": "string",
+			"proposals": [
+				"latest"
+			],
+			"default": "latest",
+			"description": "Versão do OpenCode a instalar: 'latest' ou uma versão específica (ex.: 1.0.180)."
+		},
+		"installMethod": {
+			"type": "string",
+			"enum": [
+				"auto",
+				"npm",
+				"native"
+			],
+			"default": "auto",
+			"description": "Método de instalação. 'auto' usa npm quando disponível e recorre ao instalador nativo; 'npm' força a instalação via npm global; 'native' força o instalador oficial do OpenCode."
+		}
+	},
+	"installsAfter": [
+		"ghcr.io/devcontainers/features/common-utils",
+		"ghcr.io/devcontainers/features/node"
+	],
+	"containerEnv": {
+		"PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.opencode/bin"
+	}
+}
