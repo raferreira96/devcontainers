@@ -1,0 +1,28 @@
+name: "Publicar Templates"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/templates/**"
+      - ".github/workflows/publish-templates.yaml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Publicar Templates no GHCR"
+        uses: devcontainers/action@v1
+        with:
+          publish-templates: "true"
+          base-path-to-templates: "./src/templates"
+          disable-repo-tagging: "true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

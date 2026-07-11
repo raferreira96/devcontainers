@@ -1,0 +1,42 @@
+{
+	"id": "node-postgis-redis-minio",
+	"version": "1.0.0",
+	"name": "Node.js + PostGIS + Redis + MinIO (com CLIs de IA)",
+	"description": "Ambiente de desenvolvimento Node.js completo, baseado na imagem do repositório (ghcr.io/raferreira96/devcontainers/node), orquestrado via Docker Compose com PostgreSQL/PostGIS, Redis e MinIO. Inclui todas as CLIs de IA da coleção (Claude Code, Codex, OpenCode, Antigravity, Pi e RTK) e persiste as configurações/credenciais dos agentes montando os diretórios do host.",
+	"documentationURL": "https://github.com/raferreira96/devcontainers/tree/main/src/templates/node-postgis-redis-minio",
+	"options": {
+		"imageTag": {
+			"type": "string",
+			"description": "Tag da imagem Node do repositório (ghcr.io/raferreira96/devcontainers/node).",
+			"proposals": [
+				"latest",
+				"22",
+				"20"
+			],
+			"default": "latest"
+		},
+		"postgresVersion": {
+			"type": "string",
+			"description": "Versão maior do PostgreSQL usada pela imagem PostGIS (postgis/postgis:<versão>-3.5).",
+			"proposals": [
+				"17",
+				"16",
+				"15"
+			],
+			"default": "17"
+		},
+		"postgresDb": {
+			"type": "string",
+			"description": "Nome do banco de dados criado automaticamente no PostgreSQL.",
+			"proposals": [
+				"app",
+				"dev",
+				"postgres"
+			],
+			"default": "app"
+		}
+	},
+	"platforms": [
+		"Node.js"
+	]
+}

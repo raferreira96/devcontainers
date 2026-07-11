@@ -2,7 +2,8 @@
 
 Coleção de artefatos [Dev Container](https://containers.dev) publicados no GHCR
 sob o namespace **`raferreira96`**: **Features** (instaláveis em qualquer Dev
-Container) e **Imagens** (bases prontas para uso).
+Container), **Imagens** (bases prontas para uso) e **Templates** (ambientes
+completos prontos para aplicar em um projeto).
 
 ## Features
 
@@ -16,6 +17,7 @@ no campo `features` do `devcontainer.json`.
 | [`antigravity`](src/features/antigravity/) | Instala o [Antigravity CLI](https://antigravity.google/docs/cli) (`agy`), o agente de codificação da Google para o terminal, via instalador nativo oficial. |
 | [`opencode`](src/features/opencode/) | Instala o [OpenCode](https://opencode.ai/docs), o agente de codificação de código aberto para o terminal, via npm global ou instalador nativo. |
 | [`pi`](src/features/pi/) | Instala o [Pi](https://pi.dev/docs), o agente de codificação de código aberto (BYOK) para o terminal, via npm global ou instalador nativo. |
+| [`rtk`](src/features/rtk/) | Instala o [RTK](https://github.com/rtk-ai/rtk) (Rust Token Killer), proxy de CLI que reduz o consumo de tokens em operações de desenvolvimento. |
 
 ```jsonc
 "features": {
@@ -39,18 +41,36 @@ no campo `image` do `devcontainer.json`.
 }
 ```
 
+## Templates
+
+Ambientes de Dev Container completos, aplicáveis a um projeto com **Dev Containers:
+New Dev Container...** ou `devcontainer templates apply`.
+
+| Template | Descrição |
+| -------- | --------- |
+| [`node-postgis-redis-minio`](src/templates/node-postgis-redis-minio/) | Node.js (imagem do repositório) + PostgreSQL/PostGIS + Redis + MinIO via Docker Compose, com **todas as CLIs de IA** e persistência das configurações dos agentes montadas do host. |
+
+```bash
+devcontainer templates apply \
+    -t ghcr.io/raferreira96/devcontainers/node-postgis-redis-minio:latest \
+    --workspace-folder .
+```
+
 ## Estrutura do repositório
 
 ```
 src/
 ├── features/<id>/     # devcontainer-feature.json + install.sh
-└── images/<id>/       # .devcontainer/ (Dockerfile + devcontainer.json) + README.md
+├── images/<id>/       # .devcontainer/ (Dockerfile + devcontainer.json) + README.md
+└── templates/<id>/    # devcontainer-template.json + .devcontainer/ + README.md
 test/
-└── features/<id>/     # test.sh + scenarios.json (dev-container-features-test-lib)
+├── features/<id>/     # test.sh + scenarios.json (dev-container-features-test-lib)
+└── templates/<id>/    # test.sh (teste de fumaça executado no container)
 .github/workflows/
-├── test.yaml          # testa as features em PRs e na main
-├── release.yaml       # publica as features no GHCR
-└── publish-images.yaml # build multi-arquitetura e push das imagens no GHCR
+├── test.yaml             # testa as features em PRs e na main
+├── release.yaml          # publica as features no GHCR
+├── publish-images.yaml   # build multi-arquitetura e push das imagens no GHCR
+└── publish-templates.yaml # publica os templates no GHCR
 ```
 
 ## Desenvolvimento
@@ -74,6 +94,7 @@ A publicação no GHCR é automática ao integrar na branch `main`:
 
 - **Features** → `release.yaml` (via `devcontainers/action`).
 - **Imagens** → `publish-images.yaml` (via `docker buildx`, `linux/amd64` e `linux/arm64`).
+- **Templates** → `publish-templates.yaml` (via `devcontainers/action`).
 
 ## Licença
 

@@ -1,0 +1,82 @@
+{
+	"name": "Node.js + PostGIS + Redis + MinIO",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	// A imagem base já provê o usuário não-root 'node' (UID/GID 1000).
+	"remoteUser": "node",
+
+	"features": {
+		// Instala zsh e utilitários comuns; roda antes das CLIs de IA
+		// (que declaram installsAfter common-utils).
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"username": "node"
+		},
+		// Todas as CLIs de IA da coleção.
+		"ghcr.io/raferreira96/devcontainers/claude-code:1": {},
+		"ghcr.io/raferreira96/devcontainers/codex:1": {},
+		"ghcr.io/raferreira96/devcontainers/opencode:1": {},
+		"ghcr.io/raferreira96/devcontainers/antigravity:1": {},
+		"ghcr.io/raferreira96/devcontainers/pi:1": {},
+		"ghcr.io/raferreira96/devcontainers/rtk:1": {}
+	},
+
+	// Garante que os diretórios de configuração dos agentes existam no HOST
+	// antes de criar o container. Assim os bind mounts anexam a caminhos já
+	// existentes (evita pastas criadas como root pelo Docker) e o
+	// ~/.claude.json é montado como arquivo — e não como diretório.
+	// Executado no host: em Windows, use WSL ou ajuste manualmente os caminhos.
+	"initializeCommand": "mkdir -p ${localEnv:HOME}/.claude ${localEnv:HOME}/.codex ${localEnv:HOME}/.config/opencode ${localEnv:HOME}/.local/share/opencode ${localEnv:HOME}/.pi ${localEnv:HOME}/.gemini ${localEnv:HOME}/.config/rtk ${localEnv:HOME}/.rtk && touch ${localEnv:HOME}/.claude.json",
+
+	// Persiste as configurações/credenciais dos agentes de IA no host,
+	// para que autenticação, histórico e ajustes sobrevivam a rebuilds.
+	"mounts": [
+		// Claude Code
+		"source=${localEnv:HOME}/.claude,target=/home/node/.claude,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.claude.json,target=/home/node/.claude.json,type=bind,consistency=cached",
+		// Codex CLI
+		"source=${localEnv:HOME}/.codex,target=/home/node/.codex,type=bind,consistency=cached",
+		// OpenCode (config + dados/credenciais)
+		"source=${localEnv:HOME}/.config/opencode,target=/home/node/.config/opencode,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.local/share/opencode,target=/home/node/.local/share/opencode,type=bind,consistency=cached",
+		// Pi (settings.json, auth.json, trust.json em ~/.pi/agent)
+		"source=${localEnv:HOME}/.pi,target=/home/node/.pi,type=bind,consistency=cached",
+		// Antigravity (agy) — reaproveita ~/.gemini (settings + GEMINI.md)
+		"source=${localEnv:HOME}/.gemini,target=/home/node/.gemini,type=bind,consistency=cached",
+		// RTK (config.toml + banco de analytics)
+		"source=${localEnv:HOME}/.config/rtk,target=/home/node/.config/rtk,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.rtk,target=/home/node/.rtk,type=bind,consistency=cached"
+	],
+
+	// Portas dos serviços do Compose (formato serviço:porta).
+	"forwardPorts": [
+		"db:5432",
+		"redis:6379",
+		"minio:9000",
+		"minio:9001"
+	],
+	"portsAttributes": {
+		"5432": { "label": "PostgreSQL/PostGIS" },
+		"6379": { "label": "Redis" },
+		"9000": { "label": "MinIO (API S3)" },
+		"9001": { "label": "MinIO (Console)" }
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"ckolkman.vscode-postgres",
+				"cweijan.vscode-redis-client"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh"
+			}
+		}
+	},
+
+	"postCreateCommand": "node -v && npm -v"
+}

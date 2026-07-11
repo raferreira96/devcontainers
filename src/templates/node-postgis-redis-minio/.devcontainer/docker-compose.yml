@@ -1,0 +1,70 @@
+# Stack de desenvolvimento: Node.js + PostgreSQL/PostGIS + Redis + MinIO.
+# O serviço 'app' é o container de desenvolvimento (onde o VS Code se conecta).
+# Os demais são serviços de apoio, acessíveis pelo nome do serviço na rede
+# padrão do Compose (db, redis, minio).
+
+services:
+  app:
+    # Imagem Node do próprio repositório, publicada no GHCR.
+    image: ghcr.io/raferreira96/devcontainers/node:${templateOption:imageTag}
+    # Mantém o container vivo; o VS Code executa comandos por dentro dele.
+    command: sleep infinity
+    # Monta o diretório-pai do projeto em /workspaces (padrão dos Dev Containers).
+    volumes:
+      - ../..:/workspaces:cached
+    environment:
+      # PostgreSQL / PostGIS
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/${templateOption:postgresDb}
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: ${templateOption:postgresDb}
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # MinIO (API compatível com S3)
+      S3_ENDPOINT: http://minio:9000
+      AWS_ENDPOINT_URL_S3: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_REGION: us-east-1
+    depends_on:
+      - db
+      - redis
+      - minio
+
+  db:
+    # PostGIS oficial sobre PostgreSQL. A extensão PostGIS já vem instalada;
+    # habilite-a por banco com: CREATE EXTENSION IF NOT EXISTS postgis;
+    image: postgis/postgis:${templateOption:postgresVersion}-3.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${templateOption:postgresDb}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Persistência via AOF para os dados sobreviverem a reinícios.
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    # API S3 na 9000; console web na 9001.
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
