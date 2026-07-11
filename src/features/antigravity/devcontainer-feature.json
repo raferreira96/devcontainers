@@ -1,0 +1,13 @@
+{
+	"id": "antigravity",
+	"version": "1.0.0",
+	"name": "Antigravity CLI",
+	"documentationURL": "https://github.com/raferreira96/devcontainers/tree/main/src/features/antigravity",
+	"description": "Instala o Antigravity CLI (agy), o agente de codificação da Google para o terminal.",
+	"installsAfter": [
+		"ghcr.io/devcontainers/features/common-utils"
+	],
+	"containerEnv": {
+		"PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"
+	}
+}
