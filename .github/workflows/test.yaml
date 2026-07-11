@@ -1,0 +1,30 @@
+name: "Testar Features"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        features:
+          - claude-code
+          - codex
+          - antigravity
+          - opencode
+          - pi
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Instalar o devcontainer CLI"
+        run: npm install -g @devcontainers/cli
+
+      - name: "Testar a feature '${{ matrix.features }}'"
+        run: devcontainer features test --features ${{ matrix.features }} --log-level trace .
