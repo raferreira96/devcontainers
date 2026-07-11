@@ -2,23 +2,80 @@ name: "Testar Features"
 
 on:
   pull_request:
+    paths:
+      - "src/features/**"
+      - "test/features/**"
+      - ".github/workflows/test.yaml"
   push:
     branches:
       - main
+    paths:
+      - "src/features/**"
+      - "test/features/**"
+      - ".github/workflows/test.yaml"
   workflow_dispatch:
 
 jobs:
+  # Detecta apenas as features cujos arquivos (src/ ou test/) foram alterados,
+  # para não testar toda a coleção a cada commit.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      features: ${{ steps.detect.outputs.features }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Detectar features alteradas"
+        id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            # Execução manual: testa todas as features.
+            feats="$(ls src/features)"
+          else
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              range="${BASE_SHA}...HEAD"
+            elif [ -n "${BEFORE_SHA:-}" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+              range="${BEFORE_SHA}...${AFTER_SHA}"
+            else
+              range="HEAD^...HEAD"
+            fi
+
+            # Extrai o id da feature (3º segmento) dos caminhos alterados sob src/ e test/.
+            feats="$(git diff --name-only "$range" \
+              | grep -E '^(src|test)/features/[^/]+/' \
+              | cut -d/ -f3 \
+              | sort -u || true)"
+          fi
+
+          # Mantém apenas features que ainda existem em src/ (ignora remoções).
+          existing=""
+          for f in $feats; do
+            if [ -d "src/features/$f" ]; then
+              existing="${existing}${f}"$'\n'
+            fi
+          done
+
+          json="$(printf '%s' "$existing" | jq -R -s -c 'split("\n") | map(select(length > 0))')"
+          echo "features=$json" >> "$GITHUB_OUTPUT"
+          echo "Features a testar: $json"
+
   test:
+    needs: changes
+    if: needs.changes.outputs.features != '[]'
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        features:
-          - claude-code
-          - codex
-          - antigravity
-          - opencode
-          - pi
       fail-fast: false
+      matrix:
+        features: ${{ fromJSON(needs.changes.outputs.features) }}
     steps:
       - uses: actions/checkout@v4
 

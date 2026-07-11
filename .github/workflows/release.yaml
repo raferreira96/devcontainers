@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "src/features/**"
+      - ".github/workflows/release.yaml"
   workflow_dispatch:
 
 jobs:
